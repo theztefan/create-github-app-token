@@ -23153,13 +23153,13 @@ async function pRetry(input, options = {}) {
 }
 
 // lib/main.js
-async function main(appId, privateKey, enterprise, owner, repositories, permissions, core, createAppAuth2, request2, skipTokenRevoke) {
+async function main(clientId, privateKey, enterprise, owner, repositories, permissions, core, createAppAuth2, request2, skipTokenRevoke) {
   if (enterprise && (owner || repositories.length > 0)) {
     throw new Error("Cannot use 'enterprise' input with 'owner' or 'repositories' inputs");
   }
   const target = resolveInstallationTarget(enterprise, owner, repositories, core);
   const auth5 = createAppAuth2({
-    appId,
+    appId: clientId,
     privateKey,
     request: request2
   });
@@ -23351,7 +23351,10 @@ if (!process.env.GITHUB_REPOSITORY_OWNER) {
 }
 async function run() {
   ensureNativeProxySupport();
-  const appId = getInput("app-id");
+  const clientId = getInput("client-id") || getInput("app-id");
+  if (!clientId) {
+    throw new Error("The 'client-id' (or deprecated 'app-id') input must be set to a non-empty string. If using a secret or variable, ensure it is available in this workflow context.");
+  }
   const privateKey = getInput("private-key");
   const enterprise = getInput("enterprise");
   const owner = getInput("owner");
@@ -23359,7 +23362,7 @@ async function run() {
   const skipTokenRevoke = getBooleanInput("skip-token-revoke");
   const permissions = getPermissionsFromInputs(process.env);
   return main(
-    appId,
+    clientId,
     privateKey,
     enterprise,
     owner,

@@ -18,7 +18,10 @@ if (!process.env.GITHUB_REPOSITORY_OWNER) {
 async function run() {
   ensureNativeProxySupport();
 
-  const appId = core.getInput("app-id");
+  const clientId = core.getInput("client-id") || core.getInput("app-id");
+  if (!clientId) {
+    throw new Error("The 'client-id' (or deprecated 'app-id') input must be set to a non-empty string. If using a secret or variable, ensure it is available in this workflow context.");
+  }
   const privateKey = core.getInput("private-key");
   const enterprise = core.getInput("enterprise");
   const owner = core.getInput("owner");
@@ -33,7 +36,7 @@ async function run() {
   const permissions = getPermissionsFromInputs(process.env);
 
   return main(
-    appId,
+    clientId,
     privateKey,
     enterprise,
     owner,
