@@ -220,6 +220,45 @@ POST /app/installations/123456/access_tokens
 {"repositories":["failed-repo"]}
 `;
 
+exports[`main-token-get-owner-set-client-error.test.js > stderr 1`] = `
+RequestError [HttpError]: Forbidden
+    at fetchWrapper (file://<cwd>/node_modules/@octokit/request/dist-bundle/index.js:<line>:<column>)
+    at process.processTicksAndRejections (node:internal/process/task_queues:<line>:<column>)
+    at async hook (file://<cwd>/node_modules/@octokit/auth-app/dist-node/index.js:<line>:<column>)
+    at async getTokenFromOwner (file://<cwd>/lib/main.js:<line>:<column>)
+    at async pRetry (file://<cwd>/node_modules/p-retry/index.js:<line>:<column>)
+    at async main (file://<cwd>/lib/main.js:<line>:<column>)
+    at async test (file://<cwd>/tests/main.js:<line>:<column>)
+    at async file://<cwd>/tests/main-token-get-owner-set-client-error.test.js:<line>:<column> {
+  status: 403,
+  request: {
+    method: 'GET',
+    url: 'https://api.github.com/users/smockle/installation',
+    headers: {
+      accept: 'application/vnd.github.v3+json',
+      'user-agent': 'actions/create-github-app-token',
+      authorization: 'bearer [REDACTED]'
+    },
+    request: { hook: [Function: bound hook] AsyncFunction }
+  },
+  response: {
+    url: 'https://api.github.com/users/smockle/installation',
+    status: 403,
+    headers: { 'content-type': 'application/json' },
+    data: { message: 'Forbidden' }
+  },
+  [cause]: undefined
+}
+`;
+
+exports[`main-token-get-owner-set-client-error.test.js > stdout 1`] = `
+Input 'repositories' is not set. Creating token for all repositories owned by smockle.
+Failed to create token for "smockle" (attempt 1): Forbidden
+::error::Forbidden
+--- REQUESTS ---
+GET /users/smockle/installation
+`;
+
 exports[`main-token-get-owner-set-fail-response.test.js > stdout 1`] = `
 Input 'repositories' is not set. Creating token for all repositories owned by smockle.
 Failed to create token for "smockle" (attempt 1): GitHub API not available

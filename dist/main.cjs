@@ -23167,15 +23167,7 @@ async function main(clientId, privateKey, enterprise, owner, repositories, permi
   if (target.type === "enterprise") {
     ({ authentication, installationId, appSlug } = await pRetry(
       () => getTokenFromEnterprise(request2, auth5, target.enterprise, permissions),
-      {
-        shouldRetry: ({ error: error2 }) => error2.status >= 500,
-        onFailedAttempt: (context) => {
-          core.info(
-            `Failed to create token for enterprise "${target.enterprise}" (attempt ${context.attemptNumber}): ${context.error.message}`
-          );
-        },
-        retries: 3
-      }
+      createTokenRetryOptions(core, `enterprise "${target.enterprise}"`)
     ));
   } else if (target.type === "repository") {
     ({ authentication, installationId, appSlug } = await pRetry(
@@ -23186,29 +23178,12 @@ async function main(clientId, privateKey, enterprise, owner, repositories, permi
         target.repositories,
         permissions
       ),
-      {
-        shouldRetry: ({ error: error2 }) => error2.status >= 500,
-        onFailedAttempt: (context) => {
-          core.info(
-            `Failed to create token for "${target.repositories.join(
-              ","
-            )}" (attempt ${context.attemptNumber}): ${context.error.message}`
-          );
-        },
-        retries: 3
-      }
+      createTokenRetryOptions(core, `"${target.repositories.join(",")}"`)
     ));
   } else {
     ({ authentication, installationId, appSlug } = await pRetry(
       () => getTokenFromOwner(request2, auth5, target.owner, permissions),
-      {
-        onFailedAttempt: (context) => {
-          core.info(
-            `Failed to create token for "${target.owner}" (attempt ${context.attemptNumber}): ${context.error.message}`
-          );
-        },
-        retries: 3
-      }
+      createTokenRetryOptions(core, `"${target.owner}"`)
     ));
   }
   core.setSecret(authentication.token);
@@ -23259,6 +23234,17 @@ function resolveInstallationTarget(enterprise, owner, repositories, core) {
     type: "repository",
     owner: parsedOwner,
     repositories
+  };
+}
+function createTokenRetryOptions(core, targetDescription) {
+  return {
+    shouldRetry: ({ error: error2 }) => error2.status >= 500,
+    onFailedAttempt: (context) => {
+      core.info(
+        `Failed to create token for ${targetDescription} (attempt ${context.attemptNumber}): ${context.error.message}`
+      );
+    },
+    retries: 3
   };
 }
 async function createInstallationAuthResult(auth5, installation, permissions, options = {}) {
