@@ -23265,7 +23265,7 @@ function getTokenRetryDescription(target) {
     case "enterprise":
       return `enterprise "${target.enterprise}"`;
     case "repository":
-      return `"${target.repositories.join(",")}"`;
+      return `"${target.repositories.map((repository) => `${target.owner}/${repository}`).join(",")}"`;
     case "owner":
       return `"${target.owner}"`;
     /* c8 ignore next 2 */
