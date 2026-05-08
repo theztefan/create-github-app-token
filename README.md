@@ -208,7 +208,7 @@ jobs:
         id: app-token
         with:
           client-id: ${{ vars.APP_CLIENT_ID }}
-          private-key: ${{ secrets.PRIVATE_KEY }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
           enterprise: my-enterprise-slug
       - name: Call enterprise management REST API with gh
         run: |
@@ -220,7 +220,7 @@ jobs:
 ### Create a token with specific permissions
 
 > [!NOTE]
-> Selected permissions must be granted to the installation of the specified app and repository owner. Setting a permission that the installation does not have will result in an error.
+> Selected permissions must be granted to the specified app installation. Setting a permission that the installation does not have will result in an error.
 
 ```yaml
 on: [issues]
@@ -380,10 +380,10 @@ steps:
 
 ### `enterprise`
 
-**Optional:** The slug version of the enterprise name to generate a token for enterprise-level app installations.
+**Optional:** The slug of the enterprise account to generate a token for an enterprise installation.
 
 > [!NOTE]
-> The `enterprise` input is mutually exclusive with `owner` and `repositories`. GitHub Apps can be installed on enterprise accounts with permissions that let them call enterprise management APIs. Enterprise installations do not grant access to organization or repository resources.
+> The `enterprise` input is mutually exclusive with `owner` and `repositories`. Use it when the GitHub App is installed on an enterprise account. Enterprise installation tokens can call enterprise APIs, but do not grant organization or repository access.
 
 ### `permission-<permission name>`
 
@@ -415,13 +415,14 @@ GitHub App slug.
 
 ## How it works
 
-The action creates an installation access token using [the `POST /app/installations/{installation_id}/access_tokens` endpoint](https://docs.github.com/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app). By default,
+The action creates an installation access token using [the `POST /app/installations/{installation_id}/access_tokens` endpoint](https://docs.github.com/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app).
 
-1. The token is scoped to the current repository or `repositories` if set.
-2. The token inherits all the installation's permissions.
-3. The token is set as output `token` which can be used in subsequent steps.
-4. Unless the `skip-token-revoke` input is set to true, the token is revoked in the `post` step of the action, which means it cannot be passed to another job.
-5. The token is masked, it cannot be logged accidentally.
+The token target depends on the inputs: `enterprise` creates a token for an enterprise installation, `owner` without `repositories` creates a token for all repositories in the owner's installation, `repositories` scopes the token to those repositories, and no target inputs scopes the token to the current repository.
+
+1. The token inherits all the installation's permissions.
+2. The token is set as output `token` which can be used in subsequent steps.
+3. Unless the `skip-token-revoke` input is set to true, the token is revoked in the `post` step of the action, which means it cannot be passed to another job.
+4. The token is masked, it cannot be logged accidentally.
 
 > [!NOTE]
 > Installation permissions can differ from the app's permissions they belong to. Installation permissions are set when an app is installed on an account. When the app adds more permissions after the installation, an account administrator will have to approve the new permissions before they are set on the installation.
