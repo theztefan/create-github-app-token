@@ -16,7 +16,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^3.0.0",
+    "@actions/core": "^3.0.1",
     "@octokit/auth-app": "^8.2.0",
     "@octokit/request": "^10.0.8",
     "p-retry": "^8.0.0"
@@ -28,33 +28,5 @@
     "open-cli": "^9.0.0",
     "undici": "^7.24.6",
     "yaml": "^2.8.3"
-  },
-  "release": {
-    "branches": [
-      "+([0-9]).x",
-      "main",
-      {
-        "name": "beta",
-        "prerelease": true
-      }
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/github",
-      "@semantic-release/npm",
-      "semantic-release-plugin-github-breaking-version-tag",
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "package.json",
-            "package-lock.json",
-            "dist/*"
-          ],
-          "message": "build(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-        }
-      ]
-    ]
   }
 }
