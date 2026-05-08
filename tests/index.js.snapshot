@@ -38,7 +38,6 @@ POST /app/installations/123456/access_tokens
 
 exports[`main-custom-github-api-url.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      
 - actions/create-github-app-token
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
@@ -75,7 +74,7 @@ null
 `;
 
 exports[`main-enterprise-installation-not-found.test.js > stderr 1`] = `
-Error: No enterprise installation found matching the name test-enterprise.
+Error: No enterprise installation found matching the enterprise slug "test-enterprise".
     at getTokenFromEnterprise (file://<cwd>/lib/main.js:<line>:<column>)
     at process.processTicksAndRejections (node:internal/process/task_queues:<line>:<column>)
     at async pRetry (file://<cwd>/node_modules/p-retry/index.js:<line>:<column>)
@@ -86,8 +85,8 @@ Error: No enterprise installation found matching the name test-enterprise.
 
 exports[`main-enterprise-installation-not-found.test.js > stdout 1`] = `
 Creating enterprise installation token for enterprise "test-enterprise".
-Failed to create token for enterprise "test-enterprise" (attempt 1): No enterprise installation found matching the name test-enterprise.
-::error::No enterprise installation found matching the name test-enterprise.
+Failed to create token for enterprise "test-enterprise" (attempt 1): No enterprise installation found matching the enterprise slug "test-enterprise".
+::error::No enterprise installation found matching the enterprise slug "test-enterprise".
 --- REQUESTS ---
 GET /enterprises/test-enterprise/installation
 `;
@@ -202,7 +201,6 @@ exports[`main-repo-skew.test.js > stderr 1`] = `
 
 exports[`main-repo-skew.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      
 - actions/failed-repo
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 
@@ -280,7 +278,6 @@ null
 
 exports[`main-token-get-owner-set-repo-fail-response.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      
 - actions/failed-repo
 Failed to create token for "actions/failed-repo" (attempt 1): GitHub API not available
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
@@ -299,9 +296,28 @@ POST /app/installations/123456/access_tokens
 {"repositories":["failed-repo"]}
 `;
 
+exports[`main-token-get-owner-set-repo-network-error.test.js > stdout 1`] = `
+Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
+- actions/network-repo
+Failed to create token for "actions/network-repo" (attempt 1): fetch failed
+::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+
+::set-output name=installation-id::123456
+
+::set-output name=app-slug::github-actions
+::save-state name=token::ghs_16C7e42F292c6912E7710c838347Ae178B4a
+::save-state name=expiresAt::2016-07-11T22:14:10Z
+--- REQUESTS ---
+GET /repos/actions/network-repo/installation
+GET /repos/actions/network-repo/installation
+POST /app/installations/123456/access_tokens
+{"repositories":["network-repo"]}
+`;
+
 exports[`main-token-get-owner-set-repo-set-to-many-newline.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      
 - actions/create-github-app-token
 - actions/toolkit
 - actions/checkout
@@ -322,7 +338,6 @@ POST /app/installations/123456/access_tokens
 
 exports[`main-token-get-owner-set-repo-set-to-many.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      
 - actions/create-github-app-token
 - actions/toolkit
 - actions/checkout
@@ -343,7 +358,6 @@ POST /app/installations/123456/access_tokens
 
 exports[`main-token-get-owner-set-repo-set-to-one.test.js > stdout 1`] = `
 Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      
 - actions/create-github-app-token
 ::add-mask::ghs_16C7e42F292c6912E7710c838347Ae178B4a
 

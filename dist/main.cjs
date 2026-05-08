@@ -22985,7 +22985,7 @@ function isNetworkError(error2) {
     return false;
   }
   const { message, stack } = error2;
-  if (message === "Load failed") {
+  if (message === "Load failed" || message.startsWith("Load failed (") && message.endsWith(")")) {
     return stack === void 0 || "__sentry_captured__" in error2;
   }
   if (message.startsWith("error sending request for url")) {
@@ -23249,8 +23249,7 @@ function resolveInstallationTarget(enterprise, owner, repositories, core) {
     );
   } else {
     core.info(
-      `Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:
-      ${repositories.map((repo) => `
+      `Inputs 'owner' and 'repositories' are set. Creating token for the following repositories:${repositories.map((repo) => `
 - ${parsedOwner}/${repo}`).join("")}`
     );
   }
@@ -23294,7 +23293,7 @@ function getTokenFromTarget(request2, auth5, target, permissions) {
 }
 function createTokenRetryOptions(core, targetDescription) {
   return {
-    shouldRetry: ({ error: error2 }) => error2.status >= 500,
+    shouldRetry: ({ error: error2 }) => error2.status >= 500 || isNetworkError(error2),
     onFailedAttempt: (context) => {
       core.info(
         `Failed to create token for ${targetDescription} (attempt ${context.attemptNumber}): ${context.error.message}`
@@ -23349,7 +23348,7 @@ async function getTokenFromEnterprise(request2, auth5, enterprise, permissions) 
   } catch (error2) {
     if (error2.status === 404) {
       throw new Error(
-        `No enterprise installation found matching the name ${enterprise}.`
+        `No enterprise installation found matching the enterprise slug "${enterprise}".`
       );
     }
     throw error2;
