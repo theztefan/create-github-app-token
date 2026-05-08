@@ -5,8 +5,9 @@ await test((mockPool) => {
   process.env.INPUT_ENTERPRISE = "test-enterprise";
   delete process.env.INPUT_OWNER;
   delete process.env.INPUT_REPOSITORIES;
-  process.env["INPUT_PERMISSION-ENTERPRISE-ORGANIZATIONS"] = "read";
-  process.env["INPUT_PERMISSION-ENTERPRISE-PEOPLE"] = "write";
+  process.env[
+    "INPUT_PERMISSION-ENTERPRISE-CUSTOM-PROPERTIES-FOR-ORGANIZATIONS"
+  ] = "read";
 
   // Mock the enterprise installation endpoint
   const mockInstallationId = "123456";

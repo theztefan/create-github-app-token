@@ -151,7 +151,7 @@ Creating enterprise installation token for enterprise "test-enterprise".
 --- REQUESTS ---
 GET /enterprises/test-enterprise/installation
 POST /app/installations/123456/access_tokens
-{"permissions":{"enterprise_organizations":"read","enterprise_people":"write"}}
+{"permissions":{"enterprise_custom_properties_for_organizations":"read"}}
 `;
 
 exports[`main-missing-client-and-app-id.test.js > stderr 1`] = `
