@@ -23206,29 +23206,10 @@ async function main(clientId, privateKey, enterprise, owner, repositories, permi
     privateKey,
     request: request2
   });
-  let authentication, installationId, appSlug;
-  if (target.type === "enterprise") {
-    ({ authentication, installationId, appSlug } = await pRetry(
-      () => getTokenFromEnterprise(request2, auth5, target.enterprise, permissions),
-      createTokenRetryOptions(core, `enterprise "${target.enterprise}"`)
-    ));
-  } else if (target.type === "repository") {
-    ({ authentication, installationId, appSlug } = await pRetry(
-      () => getTokenFromRepository(
-        request2,
-        auth5,
-        target.owner,
-        target.repositories,
-        permissions
-      ),
-      createTokenRetryOptions(core, `"${target.repositories.join(",")}"`)
-    ));
-  } else {
-    ({ authentication, installationId, appSlug } = await pRetry(
-      () => getTokenFromOwner(request2, auth5, target.owner, permissions),
-      createTokenRetryOptions(core, `"${target.owner}"`)
-    ));
-  }
+  const { authentication, installationId, appSlug } = await pRetry(
+    () => getTokenFromTarget(request2, auth5, target, permissions),
+    createTokenRetryOptions(core, getTokenRetryDescription(target))
+  );
   core.setSecret(authentication.token);
   core.setOutput("token", authentication.token);
   core.setOutput("installation-id", installationId);
@@ -23278,6 +23259,38 @@ function resolveInstallationTarget(enterprise, owner, repositories, core) {
     owner: parsedOwner,
     repositories
   };
+}
+function getTokenRetryDescription(target) {
+  switch (target.type) {
+    case "enterprise":
+      return `enterprise "${target.enterprise}"`;
+    case "repository":
+      return `"${target.repositories.join(",")}"`;
+    case "owner":
+      return `"${target.owner}"`;
+    /* c8 ignore next 2 */
+    default:
+      throw new Error(`Unsupported installation target type: ${target.type}`);
+  }
+}
+function getTokenFromTarget(request2, auth5, target, permissions) {
+  switch (target.type) {
+    case "enterprise":
+      return getTokenFromEnterprise(request2, auth5, target.enterprise, permissions);
+    case "repository":
+      return getTokenFromRepository(
+        request2,
+        auth5,
+        target.owner,
+        target.repositories,
+        permissions
+      );
+    case "owner":
+      return getTokenFromOwner(request2, auth5, target.owner, permissions);
+    /* c8 ignore next 2 */
+    default:
+      throw new Error(`Unsupported installation target type: ${target.type}`);
+  }
 }
 function createTokenRetryOptions(core, targetDescription) {
   return {

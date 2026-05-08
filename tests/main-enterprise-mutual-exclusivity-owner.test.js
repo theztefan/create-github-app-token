@@ -9,4 +9,5 @@ for (const [key, value] of Object.entries(DEFAULT_ENV)) {
 process.env.INPUT_ENTERPRISE = "test-enterprise";
 process.env.INPUT_OWNER = "test-owner";
 
-await import("../main.js");
+const { default: promise } = await import("../main.js");
+await promise;
